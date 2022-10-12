@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         child: SafeArea(
           child: InAppWebView(
             initialUrlRequest:
-                URLRequest(url: Uri.parse("https://drive.longern.com/")),
+                URLRequest(url: Uri.parse("https://fd.nindra.ga/")),
             onWebViewCreated: (InAppWebViewController controller) {
               _controller = controller;
             },

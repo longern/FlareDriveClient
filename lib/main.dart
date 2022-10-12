@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-WebViewController? _controller;
+InAppWebViewController? _controller;
 
 void main() => runApp(MyApp());
 
@@ -11,23 +11,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: WillPopScope(
         onWillPop: () async {
-          if (await _controller!.canGoBack()) {
-            _controller!.goBack();
-            return Future.value(false);
-          } else {
-            return Future.value(true);
-          }
+          var history = await _controller!.getCopyBackForwardList();
+          var canGoBack = (history!.currentIndex ?? 0) >= 1;
+          if (canGoBack) _controller!.goBack();
+          return !canGoBack;
         },
         child: SafeArea(
-          child: WebView(
-            initialUrl: "https://drive.longern.com/",
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController controller) {
+          child: InAppWebView(
+            initialUrlRequest:
+                URLRequest(url: Uri.parse("https://drive.longern.com/")),
+            onWebViewCreated: (InAppWebViewController controller) {
               _controller = controller;
             },
-            onPageFinished: (url) {
-              _controller!.runJavascript(
-                  "document.dispatchEvent(new Event('deviceready'));");
+            onLoadStop: (controller, url) {
+              controller.evaluateJavascript(
+                  source: "document.dispatchEvent(new Event('deviceready'));");
             },
           ),
         ),
